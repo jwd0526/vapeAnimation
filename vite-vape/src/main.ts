@@ -48,11 +48,10 @@ controls.enableRotate = true;
 controls.enableZoom = true;
 controls.enablePan = true;
 
-
-// creates custom geometry shape
+// init vBody
 const roundRectShape = new THREE.Shape();
 const x = 3.5, y = 15, z = 10;
-const radius = 1.6; // Adjust as needed
+const radius = 1.6;
 roundRectShape.moveTo(0, radius);
 roundRectShape.lineTo(0, y - radius);
 roundRectShape.quadraticCurveTo(0, y, radius, y);
@@ -62,8 +61,6 @@ roundRectShape.lineTo(x, radius);
 roundRectShape.quadraticCurveTo(x, 0, x - radius, 0);
 roundRectShape.lineTo(radius, 0);
 roundRectShape.quadraticCurveTo(0, 0, 0, radius);
-
-// gets geo settings
 const extrudeSettings = {
     depth: z,
     bevelEnabled: true,
@@ -72,17 +69,13 @@ const extrudeSettings = {
     bevelSize: radius,
     bevelThickness: radius
 };
-
-// init vBody using custom geometry
 const vBodyGeometry = new THREE.ExtrudeGeometry(roundRectShape, extrudeSettings);
 const material = new THREE.MeshPhongMaterial({ color: 0x70FFBB });
 const vBody = new THREE.Mesh(vBodyGeometry, material);
 vBody.castShadow = true;
 
-// Define chamfer size for vTip
-const chamferSize = (Math.PI / 16); // Adjust as needed
-
-// Create a rounded rectangular prism for vTip
+// init vTip
+const chamferSize = (Math.PI / 16);
 const roundRectShap = new THREE.Shape();
 const a = 1.75, b = 2.5, c = 3.5;
 const rad = chamferSize;
@@ -95,7 +88,6 @@ roundRectShap.lineTo(a, rad);
 roundRectShap.quadraticCurveTo(a, 0, a - rad, 0);
 roundRectShap.lineTo(rad, 0);
 roundRectShap.quadraticCurveTo(0, 0, 0, rad);
-
 const extrudeSetting = {
     depth: c,
     bevelEnabled: true,
@@ -104,66 +96,53 @@ const extrudeSetting = {
     bevelSize: rad,
     bevelThickness: rad
 };
-
 const vTipGeometry = new THREE.ExtrudeGeometry(roundRectShap, extrudeSetting);
 const vTipMaterial = new THREE.MeshPhongMaterial({ color: 0x70FFBB });
 const vTip = new THREE.Mesh(vTipGeometry, vTipMaterial);
 vTip.castShadow = true;
 vTip.position.set(.95, 16.2, 1.6);
 
-// Define dimensions for the triangular prism (similar to vTip)
+// init shape that blends body and tip
 const width = 4; // x-axis
 const height = 1.5; // y-axis
 const depth = 3.9; // z-axis
-
-// Create a triangular prism geometry
 const triangleShape = new THREE.Shape();
-
-// Define the shape of the triangle
 triangleShape.moveTo(-width / 2, height / 2);
 triangleShape.lineTo(width / 2, height / 2);
 triangleShape.lineTo(0, -height / 2);
-triangleShape.lineTo(-width / 2, height / 2); // Close the triangle
-
-// Extrude the shape to create a 3D geometry
+triangleShape.lineTo(-width / 2, height / 2);
 const textrudeSettings = {
     depth: depth,
-    bevelEnabled: false // No bevel to keep it a simple triangular prism
+    bevelEnabled: false
 };
 
 const triangularPrismGeometry = new THREE.ExtrudeGeometry(triangleShape, textrudeSettings);
-
-// Define material
 const triangularPrismMaterial = new THREE.MeshPhongMaterial({ color: 0x70FFBB }); // Adjust color as needed
-
-// Create mesh
 const triangularPrism = new THREE.Mesh(triangularPrismGeometry, triangularPrismMaterial);
 triangularPrism.castShadow = true;
-
-// Set position
 triangularPrism.position.set(1.81, 16.8, 5.3); // Adjust position as needed
 triangularPrism.rotateX(Math.PI)
 
 
-// init lighting
+// ambient light
 const ambLight = new THREE.AmbientLight(0xffffff, .2)
 scene.add(ambLight);  
 
-
-const light2 = new THREE.PointLight(0xffffff, 2, 100); // reducing the distance for better control
+// point light
+const light2 = new THREE.PointLight(0xffffff, 2, 100); 
 light2.position.set(0, 40, 0);
 light2.name = "SUNLIGHT";
 light2.castShadow = true;
 light2.decay = .1;
 scene.add(light2);
 
-// Set up shadow properties for the light
+// shadow light props
 light2.shadow.mapSize.width = 2048;
 light2.shadow.mapSize.height = 2048;
-light2.shadow.camera.near = 0.5; // Adjust according to your scene
-light2.shadow.camera.far = 100; // Adjust according to your scene
+light2.shadow.camera.near = 0.5;
+light2.shadow.camera.far = 100;
 
-// Set up the floor
+// init floor
 const floorGeometry = new THREE.PlaneGeometry(50, 50);
 const floorMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -172,13 +151,13 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.y = -10;
 scene.add(floor);
 
-// Position and orientation adjustments for geometries
+// init group
 const group = new THREE.Group();
-group.position.set(-2.5, 5, 1); // Adjust the position of the group
-group.rotation.y = Math.PI / 2; // Adjust the rotation of the group
+group.position.set(-2.5, 5, 1);
+group.rotation.y = Math.PI / 2;
 
 
-// Add geometries to the group
+// add geometries to the group
 group.add(vBody);
 group.add(vTip);
 group.add(triangularPrism);
@@ -198,18 +177,16 @@ loader.load('path/to/font.json', function (font) {
 
     const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.position.set(x, y, z); // Set the position of the text
-    scene.add(textMesh); // Add the text to the scene
+    textMesh.position.set(x, y, z);
+    scene.add(textMesh);
 });
 
-
-// Update the camera to focus on the group
 camera.position.set(0, 25, 30);
 camera.lookAt(group.position);
 
+// movement controls
 function onDocumentKeyDown(event: KeyboardEvent) {
   var keyCode = event.keyCode;
-  // Add key codes for different directions
   if (keyCode == 39) {        // left arrow
       group.rotation.y -= (Math.PI / 16);
   } else if (keyCode == 37) { // right arrow
@@ -238,15 +215,10 @@ function onDocumentKeyDown(event: KeyboardEvent) {
 }
 
 function funnyAnimation() {
-
-  // Define the target rotation and position
   const targetRotation = new THREE.Euler(0, 0, Math.PI / 2);
   const targetPosition = new THREE.Vector3(-2.5, 5, 1);
-  // Define a function to update rotation and position
     function updateRotationAndPosition() {
-      
-      // Update rotation for each axis
-      const rotationSpeed = 40; // Slower speed than before
+      const rotationSpeed = 40;
       if (Math.abs(group.rotation.z - targetRotation.z) > 0.01) {
         group.rotation.z += (targetRotation.z - group.rotation.z) / rotationSpeed;
       }
@@ -256,28 +228,22 @@ function funnyAnimation() {
       if (Math.abs(group.rotation.x) > 0.01) {
         group.rotation.x += (0 - group.rotation.x) / rotationSpeed;
       }
-
-      // Update position
-      const positionSpeed = 40; // Adjust speed as needed
+      const positionSpeed = 40;
       if (group.position.distanceTo(targetPosition) > 0.01) {
         group.position.lerp(targetPosition, 1 / positionSpeed);
       }
-
-      // Render the scene
       renderer.render(scene, camera);
-
-      // Continue animation if not reached target
       if ((Math.abs(group.rotation.z - targetRotation.z) > 0.01 ||
           Math.abs(group.rotation.y) > 0.01 ||
           Math.abs(group.rotation.x) > 0.01 ||
           group.position.distanceTo(targetPosition) > 0.01)) {
         requestAnimationFrame(updateRotationAndPosition);
       } else {
+        // when complete, do...
         canDoHeli = false;
         helicopter();
       }
     }
-  // Start the animation
   requestAnimationFrame(updateRotationAndPosition);
 }
 
@@ -297,53 +263,33 @@ function helicopter() {
       const randomY = Math.random() * shakeIntensity - shakeIntensity / 2;
       camera.position.x += randomX;
       camera.position.y += randomY;
-      shakeDuration -= 16; // Assuming a frame rate of 60fps
+      shakeDuration -= 16; // refresh rate of ~60
     } else {
-      // Accelerate rotation speed
       rotationSpeed += acceleration;
-
       if (rotationSpeed >= 1.5) {
-        // Increase group position y with accelerating speed until off-screen
         if (group.position.y < 60) {
           group.position.y += ySpeed;
-          ySpeed += yAcceleration; // Increase speed gradually
+          ySpeed += yAcceleration;
         }
       }
-
-      // Update rotation
       group.rotation.y += rotationSpeed;
     }
-
-    // Render the scene
     renderer.render(scene, camera);
-
-    // Continue animation until group is off-screen
     if (group.position.y < 60 || shakeDuration > 0) {
       requestAnimationFrame(updateRotationAndPosition);
     }
   }
-
-  // Start the animation
   requestAnimationFrame(updateRotationAndPosition);
 }
 
 function checkPositionalRange() {
   const targetPosition = new THREE.Vector3(0, 18, 30);
-  const tolerance = Math.PI; // Tolerance for proximity check
-
-  // Calculate distance to target position
+  const tolerance = Math.PI; // tolerance for proximity
   const distanceToTarget = group.position.distanceTo(targetPosition);
-
-  // Check if within range with tolerance
   if (distanceToTarget < tolerance) {
     funnyAnimation();
   }
 }
-
-// function withinRangeFunction() {
-//   isClose = 1;
-//   helicopter();
-// }
 
 var canDoHeli: Boolean = true;
 
@@ -353,10 +299,9 @@ document.body.appendChild(renderer.domElement);
 // animate
 function animate() {
   requestAnimationFrame(animate);
-  if (canDoHeli == true) {
+  if (canDoHeli == true) { // only checks proximity if it hasn't been in target proximity
     checkPositionalRange()
   }
-
   controls.update();
   renderer.render(scene, camera);
 }
